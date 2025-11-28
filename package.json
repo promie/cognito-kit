@@ -8,16 +8,31 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "deploy": "AWS_PROFILE=promie npx cdk deploy --all --require-approval never",
+    "diff": "AWS_PROFILE=promie npx cdk diff",
+    "synth": "AWS_PROFILE=promie npx cdk synth",
+    "destroy": "AWS_PROFILE=promie npx cdk destroy --all --force",
+    "lint": "eslint .",
+    "prettier:check": "prettier --check \"./**/*.{js,ts,tsx,json,css}\"",
+    "prettier:write": "prettier --write \"./**/*.{js,ts,tsx,json,css}\""
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.1",
     "@types/jest": "^29.5.12",
     "@types/node": "20.14.9",
-    "jest": "^29.7.0",
-    "ts-jest": "^29.1.5",
+    "@typescript-eslint/eslint-plugin": "^8.48.0",
+    "@typescript-eslint/parser": "^8.48.0",
     "aws-cdk": "2.155.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "jest": "^29.7.0",
+    "prettier": "^3.7.1",
+    "ts-jest": "^29.1.5",
     "ts-node": "^10.9.2",
-    "typescript": "~5.5.3"
+    "typescript": "~5.5.3",
+    "typescript-eslint": "^8.48.0"
   },
   "dependencies": {
     "aws-cdk-lib": "2.155.0",

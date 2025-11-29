@@ -1,6 +1,8 @@
 import { Stack, StackProps, CfnOutput } from 'aws-cdk-lib'
 import { Construct } from 'constructs'
+import { ApiGatewayConstruct } from './constructs/api/apiGateway.construct'
 import { CognitoConstruct } from './constructs/auth/cognito.construct'
+import { UserSignupConstruct } from './constructs/handlers/userSignup.construct'
 import { UserTableConstruct } from './constructs/storage/userTable.construct'
 
 export type CognitoKitStackProps = StackProps & {
@@ -26,6 +28,22 @@ export class CognitoKitStack extends Stack {
     const cognito = new CognitoConstruct(this, 'Cognito', {
       appName,
       stage,
+    })
+
+    // API Gateway
+    const apiGateway = new ApiGatewayConstruct(this, 'ApiGateway', {
+      appName,
+      stage,
+    })
+
+    // Auth resource for all auth endpoints
+    const authResource = apiGateway.api.root.addResource('auth')
+
+    // Signup endpoint
+    new UserSignupConstruct(this, 'UserSignup', {
+      appName,
+      authResource,
+      userPoolClient: cognito.userPoolClient,
     })
 
     // DynamoDB Outputs

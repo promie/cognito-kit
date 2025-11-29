@@ -22,8 +22,6 @@ export type SignupUserOutput = {
 /**
  * Signs up a new user in Cognito
  *
- * @param input - User email, password, and User Pool Client ID
- * @returns User ID and success message
  */
 export async function signupUser(
   input: SignupUserInput,

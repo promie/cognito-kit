@@ -20,7 +20,6 @@ export class UserSignupConstruct extends Construct {
 
     const { appName, authResource, userPoolClient } = props
 
-    // Create signup Lambda function
     this.lambda = new StandardLambda(this, 'SignupFunction', {
       appName,
       entry: join(
@@ -35,7 +34,6 @@ export class UserSignupConstruct extends Construct {
       } satisfies Config,
     })
 
-    // Add /auth/signup route
     const signupResource = authResource.addResource('signup')
     signupResource.addMethod('POST', new LambdaIntegration(this.lambda))
   }

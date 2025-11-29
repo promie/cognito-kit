@@ -30,16 +30,13 @@ export class CognitoKitStack extends Stack {
       stage,
     })
 
-    // API Gateway
     const apiGateway = new ApiGatewayConstruct(this, 'ApiGateway', {
       appName,
       stage,
     })
 
-    // Auth resource for all auth endpoints
     const authResource = apiGateway.api.root.addResource('auth')
 
-    // Signup endpoint
     new UserSignupConstruct(this, 'UserSignup', {
       appName,
       authResource,

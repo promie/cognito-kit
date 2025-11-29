@@ -2,6 +2,7 @@ import { Stack, StackProps, CfnOutput } from 'aws-cdk-lib'
 import { Construct } from 'constructs'
 import { ApiGatewayConstruct } from './constructs/api/apiGateway.construct'
 import { CognitoConstruct } from './constructs/auth/cognito.construct'
+import { UserLoginConstruct } from './constructs/handlers/userLogin.construct'
 import { UserSignupConstruct } from './constructs/handlers/userSignup.construct'
 import { UserTableConstruct } from './constructs/storage/userTable.construct'
 
@@ -38,6 +39,12 @@ export class CognitoKitStack extends Stack {
     const authResource = apiGateway.api.root.addResource('auth')
 
     new UserSignupConstruct(this, 'UserSignup', {
+      appName,
+      authResource,
+      userPoolClient: cognito.userPoolClient,
+    })
+
+    new UserLoginConstruct(this, 'UserLogin', {
       appName,
       authResource,
       userPoolClient: cognito.userPoolClient,

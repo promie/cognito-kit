@@ -1,4 +1,3 @@
-import { CfnOutput } from 'aws-cdk-lib'
 import {
   Cors,
   LogGroupLogDestination,
@@ -56,12 +55,5 @@ export class ApiGatewayConstruct extends Construct {
 
     // Set API URL
     this.apiUrl = this.api.url
-
-    // Output API URL
-    new CfnOutput(scope, 'ApiUrl', {
-      value: this.apiUrl,
-      description: 'API Gateway URL',
-      exportName: `${appName}-${stage}-ApiUrl`,
-    })
   }
 }

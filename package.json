@@ -13,6 +13,7 @@
     "diff": "AWS_PROFILE=promie npx cdk diff",
     "synth": "AWS_PROFILE=promie npx cdk synth",
     "destroy": "AWS_PROFILE=promie npx cdk destroy --all --force",
+    "clean": "rm -rf cdk.out && find app infra -type f \\( -name '*.js' -o -name '*.d.ts' \\) -delete",
     "lint": "eslint .",
     "prettier:check": "prettier --check \"./**/*.{js,ts,tsx,json,css}\"",
     "prettier:write": "prettier --write \"./**/*.{js,ts,tsx,json,css}\""

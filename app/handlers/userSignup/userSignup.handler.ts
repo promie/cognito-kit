@@ -65,7 +65,6 @@ export const handler: APIGatewayProxyHandler = async (
 
     const { email, password } = validationResult.data
 
-    // Sign up user using command
     const result = await signupUser({
       email,
       password,
@@ -84,7 +83,6 @@ export const handler: APIGatewayProxyHandler = async (
       stack: error instanceof Error ? error.stack : undefined,
     })
 
-    // Handle Cognito-specific errors
     if (error instanceof Error) {
       if (error.name === 'UsernameExistsException') {
         return {

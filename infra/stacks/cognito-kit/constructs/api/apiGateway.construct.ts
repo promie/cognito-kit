@@ -1,4 +1,4 @@
-import { CfnOutput } from 'aws-cdk-lib'
+import { RemovalPolicy } from 'aws-cdk-lib'
 import {
   Cors,
   LogGroupLogDestination,
@@ -26,6 +26,8 @@ export class ApiGatewayConstruct extends Construct {
     const logGroup = new LogGroup(this, 'ApiGatewayLogGroup', {
       logGroupName: `/aws/apigateway/${appName}-${stage}`,
       retention: RetentionDays.ONE_WEEK,
+      removalPolicy:
+        stage === 'production' ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
     })
 
     // Create REST API
@@ -56,12 +58,5 @@ export class ApiGatewayConstruct extends Construct {
 
     // Set API URL
     this.apiUrl = this.api.url
-
-    // Output API URL
-    new CfnOutput(scope, 'ApiUrl', {
-      value: this.apiUrl,
-      description: 'API Gateway URL',
-      exportName: `${appName}-${stage}-ApiUrl`,
-    })
   }
 }

@@ -5,6 +5,7 @@ import { Construct } from 'constructs'
 import { CognitoConstruct } from './cognito.construct'
 import { PostConfirmationConstruct } from '../events/postConfirmation.construct'
 import { UserLoginConstruct } from '../handlers/userLogin.construct'
+import { UserMeConstruct } from '../handlers/userMe.construct'
 import { UserSignupConstruct } from '../handlers/userSignup.construct'
 import { UserVerifyEmailConstruct } from '../handlers/userVerifyEmail.construct'
 import { UserTableConstruct } from '../storage/userTable.construct'
@@ -72,6 +73,13 @@ export class AuthenticationConstruct extends Construct {
       appName,
       authResource,
       userPoolClient: this.userPoolClient,
+    })
+
+    new UserMeConstruct(this, 'UserMe', {
+      appName,
+      authResource,
+      userPool: this.userPool,
+      userTable: this.userTable,
     })
   }
 }

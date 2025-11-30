@@ -8,11 +8,13 @@ import {
   UserPoolEmail,
   VerificationEmailStyle,
 } from 'aws-cdk-lib/aws-cognito'
+import { IFunction } from 'aws-cdk-lib/aws-lambda'
 import { Construct } from 'constructs'
 
 export interface CognitoConstructProps {
   appName: string
   stage: string
+  postConfirmationLambda?: IFunction
 }
 
 export class CognitoConstruct extends Construct {
@@ -22,7 +24,7 @@ export class CognitoConstruct extends Construct {
   constructor(scope: Construct, id: string, props: CognitoConstructProps) {
     super(scope, id)
 
-    const { appName, stage } = props
+    const { appName, stage, postConfirmationLambda } = props
 
     // Create Cognito User Pool
     this.userPool = new UserPool(this, 'UserPool', {
@@ -62,6 +64,11 @@ export class CognitoConstruct extends Construct {
           'Hello {username}, Thanks for signing up! Your verification code is {####}',
         emailStyle: VerificationEmailStyle.CODE,
       },
+      lambdaTriggers: postConfirmationLambda
+        ? {
+            postConfirmation: postConfirmationLambda,
+          }
+        : undefined,
       removalPolicy:
         stage === 'production' ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
     })

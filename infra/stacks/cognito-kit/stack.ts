@@ -1,12 +1,7 @@
 import { Stack, StackProps, CfnOutput } from 'aws-cdk-lib'
 import { Construct } from 'constructs'
 import { ApiGatewayConstruct } from './constructs/api/apiGateway.construct'
-import { CognitoConstruct } from './constructs/auth/cognito.construct'
-import { PostConfirmationConstruct } from './constructs/events/postConfirmation.construct'
-import { UserLoginConstruct } from './constructs/handlers/userLogin.construct'
-import { UserSignupConstruct } from './constructs/handlers/userSignup.construct'
-import { UserVerifyEmailConstruct } from './constructs/handlers/userVerifyEmail.construct'
-import { UserTableConstruct } from './constructs/storage/userTable.construct'
+import { AuthenticationConstruct } from './constructs/auth/authentication.construct'
 
 export type CognitoKitStackProps = StackProps & {
   appName: string
@@ -21,28 +16,6 @@ export class CognitoKitStack extends Stack {
 
     const { appName, stage } = props
 
-    // DynamoDB Table for user data
-    const userTable = new UserTableConstruct(this, 'UserTable', {
-      appName,
-      stage,
-    })
-
-    const postConfirmation = new PostConfirmationConstruct(
-      this,
-      'PostConfirmation',
-      {
-        appName,
-        userTable: userTable.table,
-      },
-    )
-
-    // Cognito User Pool for authentication
-    const cognito = new CognitoConstruct(this, 'Cognito', {
-      appName,
-      stage,
-      postConfirmationLambda: postConfirmation.lambda,
-    })
-
     const apiGateway = new ApiGatewayConstruct(this, 'ApiGateway', {
       appName,
       stage,
@@ -50,54 +23,40 @@ export class CognitoKitStack extends Stack {
 
     const authResource = apiGateway.api.root.addResource('auth')
 
-    new UserSignupConstruct(this, 'UserSignup', {
+    // Authentication (Cognito, User Table, Auth Endpoints)
+    const authentication = new AuthenticationConstruct(this, 'Authentication', {
       appName,
+      stage,
       authResource,
-      userPoolClient: cognito.userPoolClient,
-    })
-
-    new UserVerifyEmailConstruct(this, 'UserVerifyEmail', {
-      appName,
-      authResource,
-      userPoolClient: cognito.userPoolClient,
-    })
-
-    new UserLoginConstruct(this, 'UserLogin', {
-      appName,
-      authResource,
-      userPoolClient: cognito.userPoolClient,
     })
 
     // DynamoDB Outputs
     new CfnOutput(this, 'UserTableName', {
-      value: userTable.table.tableName,
+      value: authentication.userTable.tableName,
       description: 'DynamoDB table name for user data',
       exportName: `${appName}-${stage}-UserTableName`,
     })
 
-    new CfnOutput(this, 'UserTableArn', {
-      value: userTable.table.tableArn,
-      description: 'DynamoDB table ARN for user data',
-      exportName: `${appName}-${stage}-UserTableArn`,
-    })
-
     // Cognito Outputs
     new CfnOutput(this, 'UserPoolId', {
-      value: cognito.userPool.userPoolId,
+      value: authentication.userPool.userPoolId,
       description: 'Cognito User Pool ID',
       exportName: `${appName}-${stage}-UserPoolId`,
     })
 
     new CfnOutput(this, 'UserPoolClientId', {
-      value: cognito.userPoolClient.userPoolClientId,
+      value: authentication.userPoolClient.userPoolClientId,
       description: 'Cognito User Pool Client ID',
       exportName: `${appName}-${stage}-UserPoolClientId`,
     })
 
-    new CfnOutput(this, 'UserPoolArn', {
-      value: cognito.userPool.userPoolArn,
-      description: 'Cognito User Pool ARN',
-      exportName: `${appName}-${stage}-UserPoolArn`,
+    // API Gateway Outputs
+    new CfnOutput(this, 'ApiUrl', {
+      value: apiGateway.api.url,
+      description: 'API Gateway URL',
+      exportName: `${appName}-${stage}-ApiUrl`,
     })
+
+    this.apiUrl = apiGateway.api.url
   }
 }

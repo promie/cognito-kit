@@ -2,6 +2,7 @@ import { Stack, StackProps, CfnOutput } from 'aws-cdk-lib'
 import { Construct } from 'constructs'
 import { ApiGatewayConstruct } from './constructs/api/apiGateway.construct'
 import { CognitoConstruct } from './constructs/auth/cognito.construct'
+import { PostConfirmationConstruct } from './constructs/events/postConfirmation.construct'
 import { UserLoginConstruct } from './constructs/handlers/userLogin.construct'
 import { UserSignupConstruct } from './constructs/handlers/userSignup.construct'
 import { UserVerifyEmailConstruct } from './constructs/handlers/userVerifyEmail.construct'
@@ -26,10 +27,20 @@ export class CognitoKitStack extends Stack {
       stage,
     })
 
+    const postConfirmation = new PostConfirmationConstruct(
+      this,
+      'PostConfirmation',
+      {
+        appName,
+        userTable: userTable.table,
+      },
+    )
+
     // Cognito User Pool for authentication
     const cognito = new CognitoConstruct(this, 'Cognito', {
       appName,
       stage,
+      postConfirmationLambda: postConfirmation.lambda,
     })
 
     const apiGateway = new ApiGatewayConstruct(this, 'ApiGateway', {

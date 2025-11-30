@@ -4,27 +4,31 @@ import { UserPoolClient } from 'aws-cdk-lib/aws-cognito'
 import { Construct } from 'constructs'
 import { join } from 'path'
 import { StandardLambda } from '../../../../common/StandardLambda'
-import type { Config } from '../../../../../app/handlers/userLogin/config'
+import type { Config } from '../../../../../app/handlers/userVerifyEmail/config'
 
-export interface UserLoginConstructProps {
+export interface UserVerifyEmailConstructProps {
   appName: string
   authResource: Resource
   userPoolClient: UserPoolClient
 }
 
-export class UserLoginConstruct extends Construct {
+export class UserVerifyEmailConstruct extends Construct {
   public readonly lambda: StandardLambda
 
-  constructor(scope: Construct, id: string, props: UserLoginConstructProps) {
+  constructor(
+    scope: Construct,
+    id: string,
+    props: UserVerifyEmailConstructProps,
+  ) {
     super(scope, id)
 
     const { appName, authResource, userPoolClient } = props
 
-    this.lambda = new StandardLambda(this, 'LoginFunction', {
+    this.lambda = new StandardLambda(this, 'VerifyEmailFunction', {
       appName,
       entry: join(
         __dirname,
-        '../../../../../app/handlers/userLogin/userLogin.handler.ts',
+        '../../../../../app/handlers/userVerifyEmail/userVerifyEmail.handler.ts',
       ),
       handler: 'handler',
       memorySize: 256,
@@ -34,7 +38,7 @@ export class UserLoginConstruct extends Construct {
       } satisfies Config,
     })
 
-    const loginResource = authResource.addResource('login')
-    loginResource.addMethod('POST', new LambdaIntegration(this.lambda))
+    const verifyEmailResource = authResource.addResource('verify-email')
+    verifyEmailResource.addMethod('POST', new LambdaIntegration(this.lambda))
   }
 }

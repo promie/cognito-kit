@@ -1,3 +1,4 @@
+import { RemovalPolicy } from 'aws-cdk-lib'
 import {
   Cors,
   LogGroupLogDestination,
@@ -25,6 +26,8 @@ export class ApiGatewayConstruct extends Construct {
     const logGroup = new LogGroup(this, 'ApiGatewayLogGroup', {
       logGroupName: `/aws/apigateway/${appName}-${stage}`,
       retention: RetentionDays.ONE_WEEK,
+      removalPolicy:
+        stage === 'production' ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
     })
 
     // Create REST API

@@ -3,6 +3,8 @@ import { Construct } from 'constructs'
 import { ApiGatewayConstruct } from './constructs/api/apiGateway.construct'
 import { AuthenticationConstruct } from './constructs/auth/authentication.construct'
 
+import { HealthConstruct } from './constructs/handlers/health.construct'
+
 export type CognitoKitStackProps = StackProps & {
   appName: string
   stage: string
@@ -16,9 +18,16 @@ export class CognitoKitStack extends Stack {
 
     const { appName, stage } = props
 
+    // API Gateway
     const apiGateway = new ApiGatewayConstruct(this, 'ApiGateway', {
       appName,
       stage,
+    })
+
+    // Health Endpoint (Public)
+    new HealthConstruct(this, 'Health', {
+      appName,
+      api: apiGateway.api,
     })
 
     const authResource = apiGateway.api.root.addResource('auth')
@@ -34,27 +43,27 @@ export class CognitoKitStack extends Stack {
     new CfnOutput(this, 'UserTableName', {
       value: authentication.userTable.tableName,
       description: 'DynamoDB table name for user data',
-      exportName: `${appName}-${stage}-UserTableName`,
+      exportName: `${appName} -${stage} -UserTableName`,
     })
 
     // Cognito Outputs
     new CfnOutput(this, 'UserPoolId', {
       value: authentication.userPool.userPoolId,
       description: 'Cognito User Pool ID',
-      exportName: `${appName}-${stage}-UserPoolId`,
+      exportName: `${appName} -${stage} -UserPoolId`,
     })
 
     new CfnOutput(this, 'UserPoolClientId', {
       value: authentication.userPoolClient.userPoolClientId,
       description: 'Cognito User Pool Client ID',
-      exportName: `${appName}-${stage}-UserPoolClientId`,
+      exportName: `${appName} -${stage} -UserPoolClientId`,
     })
 
     // API Gateway Outputs
     new CfnOutput(this, 'ApiUrl', {
       value: apiGateway.api.url,
       description: 'API Gateway URL',
-      exportName: `${appName}-${stage}-ApiUrl`,
+      exportName: `${appName} -${stage} -ApiUrl`,
     })
 
     this.apiUrl = apiGateway.api.url

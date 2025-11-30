@@ -34,7 +34,10 @@ export const handler: APIGatewayProxyHandler = async (
   try {
     // Extract userId from Cognito Authorizer
     // The 'sub' claim contains the unique user ID (Cognito Username/UUID)
-    const claims = event.requestContext.authorizer?.claims
+    const claims = event.requestContext.authorizer?.claims as
+      | { sub: string }
+      | undefined
+
     if (!claims || !claims.sub) {
       logger.warn('Missing authorizer claims', {
         authorizer: event.requestContext.authorizer,
@@ -46,7 +49,7 @@ export const handler: APIGatewayProxyHandler = async (
       }
     }
 
-    const userId = claims.sub as string
+    const userId = claims.sub
 
     const { user } = await getUserProfile({
       userId,
